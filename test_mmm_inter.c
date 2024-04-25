@@ -12,9 +12,9 @@
 
 #define GIG 1000000000
 
-#define BASE  0 
-#define ITERS 10
-#define DELTA 200 
+#define BASE  2048 
+#define ITERS 1
+#define DELTA 0 
 
 #define OPTIONS 3
 #define IDENT 0

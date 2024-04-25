@@ -10,7 +10,7 @@
 #define GIG 1000000000
 
 #define MLENGTH 2048
-#define BITERS 7 
+#define BITERS 9 
 #define BBASE  16
 
 
@@ -32,7 +32,7 @@ typedef struct {
 /*****************************************************************************/
 int main(int argc, char *argv[])
 {
-  int OPTION;
+ 
   struct timespec diff(struct timespec start, struct timespec end);
   struct timespec time1, time2;
   struct timespec time_stamp[OPTIONS][BITERS+1];
@@ -57,15 +57,15 @@ int main(int argc, char *argv[])
   matrix_ptr c0 = new_matrix(MLENGTH);
   zero_matrix(c0, MLENGTH);
 
-  OPTION = 0;
+  int OPTION = 0;
 
-  for (i = 0; i < BITERS; i++) {
+  for (i = 0; i < 1; i++) {
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time1);
     mmm_iijjkk_blocked(a0,b0,c0,bsize);
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
     time_stamp[OPTION][i] = diff(time1,time2);
     printf("\niter = %ld bsize = %ld", i, bsize);
-    bsize *= 2;
+    // bszie *= 2;
   }
 
   bsize = BBASE;
@@ -182,15 +182,25 @@ void mmm_iijjkk_blocked(matrix_ptr a, matrix_ptr b, matrix_ptr c, long int block
   for (i = 0; i < length; i++)
     for (j = 0; j < length; j++) 
       c0[i*length+j] = 0.0;
-  
-  for (ii = 0; ii < length; ii += block_size)   
-    for (jj = 0; jj < length; jj += block_size)
-      for (kk = 0; kk < length; kk += block_size)
-        for (i = ii; i < ii+block_size; i++)
-          for (j = jj; j < jj+block_size; j++) {
-            sum = c0[i*length+j];
-            for (k = kk; k < kk+block_size; k++)
-              sum +=  a0[i*length+k]*b0[k*length+j];
-            c0[i*length+j] = sum;
-          }
+
+  for (kk = 0; kk < length; kk += block_size)
+    for (ii = 0; ii < length; ii += block_size)
+      for (jj = 0; jj < length; jj += block_size)
+        for (k = kk; k < kk + block_size; k++)
+	  for (i = ii; i < ii + block_size; i++)
+            sum = a0[i * length + k];
+              for (j = j; j < jj+ block_size; j++)
+	        c0[i * length + j] += sum * b0[k * length + j];
+
+  // IJK
+  //for (ii = 0; ii < length; ii += block_size)   
+    //for (jj = 0; jj < length; jj += block_size)
+      //for (kk = 0; kk < length; kk += block_size)
+        //for (i = ii; i < ii+block_size; i++)
+          //for (j = jj; j < jj+block_size; j++) {
+            //sum = c0[i*length+j];
+            //for (k = kk; k < kk+block_size; k++)
+             // sum +=  a0[i*length+k]*b0[k*length+j];
+            //c0[i*length+j] = sum;
+          //}
 }
